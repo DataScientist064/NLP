@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaVitae | Premium Natural Multivitamin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: #0a0a1a;
+            color: white;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #a0a0ff;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            border: none;
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(255, 0, 204, 0.5);
+            margin-top: 2rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(255, 0, 204, 0.7);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 0, 204, 0.5);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff66cc;
+        }
+
+        .ingredients-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .ingredient {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ingredient:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 0, 204, 0.5);
+        }
+
+        .ingredient h4 {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            color: #ff66cc;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-5px) translateX(-50%);
+            }
+        }
+
+        .scroll-indicator span {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .hero {
+            text-align: center;
+        }
+
+        .hero p {
+            margin: 0 auto;
+        }
+
+        .final-cta {
+            background: rgba(10, 5, 30, 0.9);
+            text-align: center;
+        }
+
+        .logo {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 100;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .nav {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #ff66cc;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff00cc, #3333ff);
+            z-index: 100;
+            transition: width 0.1s ease;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            h2 {
+                font-size: 2.5rem;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <div class="logo">AQUAVITAE</div>
+    <nav class="nav">
+        <a href="#hero">Home</a>
+        <a href="#benefits">Benefits</a>
+        <a href="#ingredients">Ingredients</a>
+        <a href="#cta">Shop</a>
+    </nav>
+    
+    <div id="canvas-container"></div>
+    
+    <section id="hero" class="hero">
+        <div class="content">
+            <h1>The only natural multivitamin you will ever need.</h1>
+            <p class="subtitle">Harnessing the pure essence of the ocean's deepest treasures</p>
+            <button class="cta-button">Discover AquaVitae</button>
+        </div>
+        <div class="scroll-indicator">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19M12 19L19 12M12 19L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Scroll to dive deeper</span>
+        </div>
+    </section>
+    
+    <section id="benefits">
+        <div class="content">
+            <h2>Ocean-Inspired Wellness</h2>
+            <p class="subtitle">Experience benefits drawn from the depths of nature's most pristine ecosystem</p>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3>Enhanced Vitality</h3>
+                    <p>Our unique formula increases energy levels and supports overall physical performance with minerals sourced from deep-sea vents.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Mental Clarity</h3>
+                    <p>Omega-rich extracts from pristine marine algae support cognitive function and mental focus throughout your day.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Immune Support</h3>
+                    <p>Rare marine compounds work synergistically to strengthen your body's natural defense systems.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Radiant Wellness</h3>
+                    <p>Antioxidants from bioluminescent organisms help protect against environmental stressors for vibrant health.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="ingredients">
+        <div class="content">
+            <h2>Pure Ocean Ingredients</h2>
+            <p class="subtitle">Sourced from the world's most pristine marine environments</p>
+            
+            <div class="ingredients-container">
+                <div class="ingredient">
+                    <h4>Deep Sea Pearl</h4>
+                    <p>Rich in minerals and amino acids for cellular regeneration.</p>
+                </div>
+                <div class="ingredient">
+                    <h4>Bioluminescent Algae</h4>
+                    <p>Powerful antioxidants that protect against oxidative stress.</p>
+                </div>
+                <div class="ingredient">
+                    <h4>Arctic Kelp</h4>
+                    <p>Iodine-rich extract supporting thyroid and metabolic health.</p>
+                </div>
+                <div class="ingredient">
+                    <h4>Marine Minerals</h4>
+                    <p>72 trace elements from pristine ocean waters for complete nutrition.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="cta" class="final-cta">
+        <div class="content">
+            <h2>Dive Into Optimal Health</h2>
+            <p class="subtitle">Experience the transformative power of ocean-sourced wellness</p>
+            <button class="cta-button">Shop AquaVitae</button>
+        </div>
+    </section>
+
+    <script>
+        // Three.js Scene Setup
+        let scene, camera, renderer, controls;
+        let objects = [];
+        let particles = [];
+        let scrollPercent = 0;
+        let previousScroll = 0;
+        
+        // Initialize Three.js scene
+        function init() {
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a1a);
+            scene.fog = new THREE.Fog(0x0a0a1a, 10, 50);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+            camera.position.y = 5;
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0x4444ff, 0.3);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xff66cc, 0.8);
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0x00ffff, 0.5, 100);
+            pointLight.position.set(-5, -5, 10);
+            scene.add(pointLight);
+            
+            // Create underwater environment
+            createWaterSurface();
+            createParticles();
+            createObjects();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation loop
+            animate();
+            
+            // Set up scroll listener
+            window.addEventListener('scroll', onScroll);
+        }
+        
+        // Create water surface with ripples
+        function createWaterSurface() {
+            const waterGeometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+            const waterMaterial = new THREE.MeshPhongMaterial({
+                color: 0x1a1a3a,
+                transparent: true,
+                opacity: 0.7,
+                wireframe: false
+            });
+            
+            const water = new THREE.Mesh(waterGeometry, waterMaterial);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = -5;
+            scene.add(water);
+            
+            // Create floating pillars
+            for (let i = 0; i < 10; i++) {
+                const pillarGeometry = new THREE.CylinderGeometry(0.5, 1, 3 + Math.random() * 5, 8);
+                const pillarMaterial = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL(0.7, 0.5, 0.3 + Math.random() * 0.2),
+                    shininess: 100
+                });
+                
+                const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+                pillar.position.x = (Math.random() - 0.5) * 40;
+                pillar.position.z = (Math.random() - 0.5) * 40;
+                pillar.position.y = -2 + Math.random() * 2;
+                pillar.rotation.x = Math.random() * 0.1;
+                pillar.rotation.z = Math.random() * 0.1;
+                
+                scene.add(pillar);
+                objects.push({
+                    mesh: pillar,
+                    originalY: pillar.position.y,
+                    speed: 0.5 + Math.random() * 1
+                });
+            }
+            
+            // Create pearls and shells
+            for (let i = 0; i < 15; i++) {
+                const pearlGeometry = new THREE.SphereGeometry(0.3 + Math.random() * 0.3, 16, 16);
+                const pearlMaterial = new THREE.MeshPhongMaterial({
+                    color: 0xffffff,
+                    shininess: 100,
+                    emissive: new THREE.Color(0x3333ff),
+                    emissiveIntensity: 0.2
+                });
+                
+                const pearl = new THREE.Mesh(pearlGeometry, pearlMaterial);
+                pearl.position.x = (Math.random() - 0.5) * 30;
+                pearl.position.z = (Math.random() - 0.5) * 30;
+                pearl.position.y = -3 + Math.random() * 2;
+                
+                scene.add(pearl);
+                objects.push({
+                    mesh: pearl,
+                    originalY: pearl.position.y,
+                    speed: 1 + Math.random() * 1.5
+                });
+            }
+        }
+        
+        // Create floating particles
+        function createParticles() {
+            const particleCount = 200;
+            const particlesGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                
+                // Random positions
+                positions[i3] = (Math.random() - 0.5) * 100;
+                positions[i3 + 1] = (Math.random() - 0.5) * 50;
+                positions[i3 + 2] = (Math.random() - 0.5) * 100;
+                
+                // Random colors (purple/pink/blue)
+                const color = new THREE.Color();
+                color.setHSL(0.7 + Math.random() * 0.2, 0.8, 0.5 + Math.random() * 0.3);
+                colors[i3] = color.r;
+                colors[i3 + 1] = color.g;
+                colors[i3 + 2] = color.b;
+                
+                particles.push({
+                    x: positions[i3],
+                    y: positions[i3 + 1],
+                    z: positions[i3 + 2],
+                    speed: 0.1 + Math.random() * 0.3
+                });
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6
+            });
+            
+            const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particleSystem);
+        }
+        
+        // Create 3D objects for product showcase
+        function createObjects() {
+            // Create a pearl capsule
+            const capsuleGeometry = new THREE.CapsuleGeometry(1, 2, 4, 8);
+            const capsuleMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8,
+                shininess: 100,
+                emissive: new THREE.Color(0x4444ff),
+                emissiveIntensity: 0.3
+            });
+            
+            const capsule = new THREE.Mesh(capsuleGeometry, capsuleMaterial);
+            capsule.position.set(5, 0, 0);
+            scene.add(capsule);
+            objects.push({
+                mesh: capsule,
+                originalY: capsule.position.y,
+                speed: 0.8
+            });
+            
+            // Create a mineral crystal
+            const crystalGeometry = new THREE.ConeGeometry(1, 3, 4);
+            const crystalMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff66cc,
+                transparent: true,
+                opacity: 0.7,
+                shininess: 80
+            });
+            
+            const crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
+            crystal.position.set(-5, 0, 0);
+            scene.add(crystal);
+            objects.push({
+                mesh: crystal,
+                originalY: crystal.position.y,
+                speed: 0.6
+            });
+            
+            // Create a sea plant
+            const plantGeometry = new THREE.ConeGeometry(0.5, 4, 8);
+            const plantMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00ff99,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const plant = new THREE.Mesh(plantGeometry, plantMaterial);
+            plant.position.set(0, -2, 5);
+            scene.add(plant);
+            objects.push({
+                mesh: plant,
+                originalY: plant.position.y,
+                speed: 0.4
+            });
+        }
+        
+        // Handle window resize
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Handle scroll events
+        function onScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            scrollPercent = scrollTop / docHeight;
+            
+            // Update progress bar
+            document.querySelector('.progress-bar').style.width = `${scrollPercent * 100}%`;
+            
+            // Update camera position based on scroll
+            camera.position.y = 5 - scrollPercent * 10;
+            
+            // Add slight rotation based on scroll direction
+            const scrollDelta = scrollTop - previousScroll;
+            camera.rotation.z = scrollDelta * 0.0005;
+            previousScroll = scrollTop;
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Animate floating objects
+            const time = Date.now() * 0.001;
+            
+            objects.forEach(obj => {
+                obj.mesh.position.y = obj.originalY + Math.sin(time * obj.speed) * 0.5;
+                obj.mesh.rotation.y += 0.01 * obj.speed;
+            });
+            
+            // Animate particles
+            particles.forEach((particle, i) => {
+                particle.y += particle.speed * 0.01;
+                if (particle.y > 25) particle.y = -25;
+                
+                const positions = scene.children.find(child => child instanceof THREE.Points).geometry.attributes.position.array;
+                positions[i * 3 + 1] = particle.y;
+            });
+            
+            scene.children.find(child => child instanceof THREE.Points).geometry.attributes.position.needsUpdate = true;
+            
+            // Render scene
+            renderer.render(scene, camera);
+        }
+        
+        // Initialize the scene when the page loads
+        window.addEventListener('load', init);
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
